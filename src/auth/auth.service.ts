@@ -62,4 +62,18 @@ export class AuthService {
 
   }
 
+  async getUserProfile(username:string){
+    const user = await this.repo.findUserName(username)
+    if (!user){
+      throw new BadRequestException('Username doesnt exist')
+    }
+
+    return {
+      id : user.id,
+      email : user.email,
+      username : user.username,
+      created_at : user.created_at
+    }
+  }
+
 }
