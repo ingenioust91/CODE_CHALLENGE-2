@@ -1,98 +1,309 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 📌 Simple Q&A Forum API (NestJS + Prisma)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A RESTful API for a simple Q&A forum application using **NestJS** and **Prisma ORM**.
+This application allows users to create threads (questions) and manage only their own threads using JWT authentication.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 Tech Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+* **Framework**: NestJS
+* **Database**: PostgreSQL
+* **ORM**: Prisma
+* **Authentication**: JWT (Passport JWT)
+* **Validation**: class-validator
+* **Documentation**: Postman
 
-## Project setup
+---
 
-```bash
-$ npm install
+## 📂 Features
+
+### 🔐 Authentication & User
+
+* Register user (password di-hash menggunakan bcrypt)
+* Login user (generate JWT)
+* Get user profile by ID
+
+### 🧵 Threads
+
+* Create thread (authenticated)
+* Get all threads (public)
+* Get thread by ID
+* Get my threads (authenticated)
+* Update thread (owner only)
+* Delete thread (owner only)
+
+---
+
+## 🗂️ Database Schema (Prisma)
+
+```prisma
+model User {
+  id            String   @id @default(uuid()) @db.Uuid
+  username      String   @unique
+  email         String   @unique
+  password_hash String
+  refresh_token String?
+  created_at    DateTime @default(now())
+
+  threads       Thread[]
+}
+
+model Thread {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String   @db.Uuid
+  title      String
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user       User @relation(fields: [user_id], references: [id])
+}
 ```
 
-## Compile and run the project
+---
+
+
+## 📦 Installation & Setup
 
 ```bash
-# development
-$ npm run start
+# clone repo
+git clone https://github.com/ingenioust91/CODE_CHALLENGE-2.git
 
-# watch mode
-$ npm run start:dev
+cd your-repo
 
-# production mode
-$ npm run start:prod
+# install dependencies
+npm install
+
+# setup prisma
+npx prisma generate
+npx prisma migrate dev --name init
+
+# run app
+npm run start:dev
 ```
 
-## Run tests
+---
+
+## 🔑 Authentication
+
+Gunakan JWT Token di header:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+---
+
+## 📡 API Endpoints
+
+### 🔐 Auth
+
+#### Register
+
+```http
+POST /api/auth/register
+```
+
+Body:
+
+```json
+{
+  "email": "user@mail.com",
+  "password": "password123"
+}
+```
+
+Response:
+
+* `201 Created`
+* `400 Bad Request`
+
+---
+
+#### Login
+
+```http
+POST /api/auth/login
+```
+
+Response:
+
+```json
+{
+  "access_token": "jwt_token"
+}
+```
+
+---
+
+### 👤 User
+
+#### Get User Profile
+
+```http
+GET /api/users/:id
+```
+
+Response:
+
+* `200 OK`
+* `404 Not Found`
+
+---
+
+### 🧵 Threads
+
+#### Create Thread ✅
+
+```http
+POST /api/threads
+```
+
+Headers:
+
+```http
+Authorization: Bearer token
+```
+
+Body:
+
+```json
+{
+  "title": "How to use Prisma?",
+  "content": "I need help with relations..."
+}
+```
+
+---
+
+#### Get All Threads ❌
+
+```http
+GET /api/threads
+```
+
+---
+
+#### Get My Threads ✅
+
+```http
+GET /api/threads/my-threads
+```
+
+---
+
+#### Get Thread by ID ❌
+
+```http
+GET /api/threads/:id
+```
+
+---
+
+#### Update Thread ✅ (Owner Only)
+
+```http
+PUT /api/threads/:id
+```
+
+---
+
+#### Delete Thread ✅ (Owner Only)
+
+```http
+DELETE /api/threads/:id
+```
+
+---
+
+## 🔒 Authorization Logic
+
+* Endpoint yang butuh login menggunakan **JwtAuthGuard**
+* Validasi ownership dilakukan dengan:
+
+  * membandingkan `thread.userId` dengan `req.user.id`
+
+Jika tidak sesuai:
+
+* `403 Forbidden`
+
+---
+
+## 🧠 Validation
+
+DTO + class-validator:
+
+Contoh:
+
+```ts
+export class CreateThreadDto {
+  @IsNotEmpty()
+    @IsString()
+    @MinLength(3)
+    title! : string
+
+    @IsNotEmpty()
+    @IsString()
+    @MinLength(3)
+    content! : string
+}
+```
+
+---
+
+## 📸 API Documentation (Postman)
+
+Tersedia di:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+http://
 ```
 
-## Deployment
+📌 Screenshot:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+
+---
+
+## 📁 Project Structure
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+src/
+├── auth/
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   ├── jwt.strategy.ts
+│
+├── threads/
+│   ├── threads.controller.ts
+│   ├── threads.service.ts
+│   ├── threads.repository.ts
+│
+├── prisma/
+│   ├── prisma.service.ts
+│
+│
+└── main.ts
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 🔐 Security Notes
 
-Check out a few resources that may come in handy when working with NestJS:
+* Password di-hash menggunakan **bcrypt**
+* Tidak expose password di response
+* Memakai `.env` untuk semua secret
+* Memakai guard untuk proteksi route
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
+## 🧪 Testing Tools
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+* Postman
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 👨‍💻 Author
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+**Inge Salim**
