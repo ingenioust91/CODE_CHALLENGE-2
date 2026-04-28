@@ -15,6 +15,14 @@ export class AuthRepository {
         return user
     }
 
+    async findUserId(id:string){
+        const user = await this.prisma.user.findUnique({
+            where : {id}
+        })
+
+        return user
+    }
+
     async getAllUser(){
         return await this.prisma.user.findMany()
         
