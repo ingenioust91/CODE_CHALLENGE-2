@@ -68,7 +68,7 @@ model Thread {
 
 ## Screen Shots
 # DIAGRAM
-![Diagram] (https://i.imgur.com/Ko5thqI.jpeg)
+![Diagram](https://i.imgur.com/Ko5thqI.jpeg)
 
 # EXAMPLE
 ![Register](https://i.imgur.com/smaZvWL.jpeg)
