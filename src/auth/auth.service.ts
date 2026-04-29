@@ -62,6 +62,34 @@ export class AuthService {
 
   }
 
+  async getNewAccessToken(refresh_token:string){
+    let payload
+    try{
+      payload = this.jwtService.verifyAsync(refresh_token, {secret:process.env.REFRESH_TOKEN_SECRET})
+    }
+    catch(e){
+      throw new UnauthorizedException('Token expired or invalid');
+    }
+
+    const isUser = await this.repo.findUserId(payload.id)
+
+    if (!isUser || !isUser.refresh_token) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const isMatch = await bcrypt.compare(isUser.refresh_token, refresh_token);
+
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const newAccessToken = await this.jwtService.signAsync(payload, {
+        expiresIn: '1h', secret: process.env.JWT_SECRET,
+    });
+
+    return { accessToken: newAccessToken };
+  }
+
   async getUserProfile(username:string){
     const user = await this.repo.findUserName(username)
     if (!user){

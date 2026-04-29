@@ -19,11 +19,8 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
-  @UseGuards(AuthGuard('jwt'), UserGuard)
-  @Get('/profile/:username')
-  getUser(@Param('username') username:string) {
-    return this.authService.getUserProfile(username);
+  @Post('/refresh')
+  refresh(@Body() body : {refresh_token : string}){
+    return this.authService.getNewAccessToken(body.refresh_token);
   }
-
-
 }

@@ -14,17 +14,31 @@ export class ThreadsRepository {
                 ...dto}
         })
 
-        return newThreads
+        return {
+            "message" : "Thread created.",
+            "data" : {
+                "title" : newThreads.title,
+                "content" : newThreads.content
+            }
+        }
     }
 
     async findAllThreads(){
-        return await this.prisma.thread.findMany()
+        const allThreads = await this.prisma.thread.findMany()
+        return {
+            "message" : "Success",
+            "data" : allThreads
+        }
     }
 
     async findMyThreads(user_id : string){
-        return await this.prisma.thread.findMany({
+        const myThread =  await this.prisma.thread.findMany({
             where : {user_id}
         })
+        return {
+            "message" : "Success",
+            "data" : myThread
+        }
     }
 
     async findThreadById(id : string){
@@ -32,7 +46,10 @@ export class ThreadsRepository {
             where : {id}
         })
 
-        return thread
+        return {
+            "message" : "Success",
+            "data" : thread
+        }
     }
 
     async findMyThreadbyId(id : string, user_id : string){
@@ -49,7 +66,13 @@ export class ThreadsRepository {
             data : dto
         })
 
-        return updatedThread
+        return {
+            "message" : "Thread successfully updated",
+            "data" : {
+                "title" : updatedThread.title,
+                "content" : updatedThread.content
+            }
+        } 
     }
 
     async removeThread(id : string){
@@ -57,7 +80,9 @@ export class ThreadsRepository {
             where : {id}
         })
 
-        return `Thread with id ${id} has been deleted succesfully`
+        return {
+            "message" : `Thread with id ${id} has been deleted succesfully`
+        }
     }
 
 }

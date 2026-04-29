@@ -41,7 +41,13 @@ export class AuthRepository {
             data : dataUser
         })
 
-        return newUser
+        return {
+            "message" : `User ${newUser.username} created.`,
+            "data" : {
+                "username" : newUser.username,
+                "email" : newUser.email
+            }
+        }
     }
 
     async updateUser(id : string, dto : UpdateAuthDto){
