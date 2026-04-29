@@ -3,6 +3,8 @@
 A RESTful API for a simple Q&A forum application using **NestJS** and **Prisma ORM**.
 This application allows users to create threads (questions) and manage only their own threads using JWT authentication.
 
+[API Docs](https://inge-salim-s-team.docs.buildwithfern.com/milestone-2/get-all-threads)
+
 ---
 
 ## 🚀 Tech Stack
@@ -60,6 +62,18 @@ model Thread {
   user       User @relation(fields: [user_id], references: [id])
 }
 ```
+
+---
+
+
+## Screen Shots
+# DIAGRAM
+![Diagram] (https://i.imgur.com/Ko5thqI.jpeg)
+
+# EXAMPLE
+![Register](https://i.imgur.com/smaZvWL.jpeg)
+![LogIn](https://i.imgur.com/49zHPqY.jpeg)
+![Get Profile](https://i.imgur.com/DgIEEAf.jpeg)
 
 ---
 
