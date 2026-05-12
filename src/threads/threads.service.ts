@@ -31,7 +31,7 @@ export class ThreadsService {
 
   async findOne(id : string){
     const hasThread = await this.repo.findThreadById(id)
-    if (!hasThread){
+    if (!hasThread.data){
       throw new BadRequestException('Thread not found')
     }
 
